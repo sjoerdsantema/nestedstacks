@@ -35,7 +35,7 @@ Resources:
           Value: Bastion Subnet
       CidrBlock: 10.0.0.0/24
       MapPublicIpOnLaunch: true
-  AutoScalingPubSubnet: #create public autoscaling 1 subnet
+  AutoScalingPubSubnet: #create public autoscaling 1 subnet for load balancing
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -48,7 +48,7 @@ Resources:
           Value: Public Autoscaling 1 Subnet
       CidrBlock: 10.0.10.0/24
       MapPublicIpOnLaunch: true
-  AutoScalingPub2Subnet: #create public autoscaling 2 subnet
+  AutoScalingPub2Subnet: #create public autoscaling 2 subnet for load balancing
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -61,7 +61,7 @@ Resources:
           Value: Public Autoscaling 2 Subnet
       CidrBlock: 10.0.11.0/24
       MapPublicIpOnLaunch: true
-  AutoScalingSubnet: #create ASG1 subnet
+  AutoScalingSubnet: #create autoscaling 1 subnet
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -74,7 +74,7 @@ Resources:
           Value: Private Autoscaling 1 Subnet
       CidrBlock: 10.0.20.0/24
       MapPublicIpOnLaunch: false
-  AutoScaling2Subnet: #create ASG2 subnet
+  AutoScaling2Subnet: #create autoscaling 2 subnet
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -87,7 +87,7 @@ Resources:
           Value: Private Autoscaling 2 Subnet
       CidrBlock: 10.0.21.0/24
       MapPublicIpOnLaunch: false
-  DatabaseSubnet: #create DB1 subnet
+  DatabaseSubnet: #create database 1 subnet
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -100,7 +100,7 @@ Resources:
           Value: Database 1 Subnet
       CidrBlock: 10.0.30.0/24
       MapPublicIpOnLaunch: false
-  Database2Subnet: #create DB2 subnet
+  Database2Subnet: #create database 2 subnet
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
@@ -156,7 +156,7 @@ Resources:
           FromPort: '80'
           ToPort: '80'
           CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
+      SecurityGroupEgress: #this should be restricted in production environments
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
   DatabaseSecurityGroup: #create database security group
@@ -308,7 +308,7 @@ Resources:
   NatEIP:
     Type: AWS::EC2::EIP
     Properties:
-      Domain: vpc #spawn an elastic ip
+      Domain: vpc #claim an elastic ip
   NatGateway: #create the NAT gateway in a seperate subnet
       Type: AWS::EC2::NatGateway
       DependsOn: NatEIP

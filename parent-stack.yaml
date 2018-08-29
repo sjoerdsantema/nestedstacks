@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Parent Stack with nested stacks for networking, ec2, app and database
 Parameters:
-  DTAP:
+  DTAP: #not used in this template but added for convenience
     Type: String
     Default: "Acceptance"
     AllowedValues:
@@ -18,7 +18,7 @@ Parameters:
   ParDatabasename:
     Type: String
     Default: mydatabase
-  Sizing:
+  Sizing: #added so sizing can easily be changed when needed
     Type: String
     Default: "Small"
     AllowedValues:
@@ -26,15 +26,15 @@ Parameters:
      - Medium
      - Large
     Description: Select sizing
-  Databaseuser:
+  Databaseuser: #change to whatever user you require
     Type: String
     Default: mydatabase
-  Databasepassword:
+  Databasepassword: #change to whatever password you require
     Type: String
     Default: mydatabase
   Ami:
     Type: String
-    Default: ami-40142d25
+    Default: ami-40142d25 #this ami is only available in us-east-2 under this number(!) consider using mapping instead of hard coding
 Resources:
  SkeletonStack:
   Type: AWS::CloudFormation::Stack

@@ -34,7 +34,7 @@ Mappings:
       "EC2": "db.t2.medium"
       "DB": "db.t2.medium"
 Resources:
- DataBaseSubnetGroup:
+ DataBaseSubnetGroup: #not in skeleton due to limitations in cfn
    Type: "AWS::RDS::DBSubnetGroup"
    Properties:
     DBSubnetGroupDescription: RDS cluster
