@@ -49,6 +49,13 @@ Mappings:
       "EC2": "db.t2.medium"
       "DB": "db.t2.medium"
 Resources:
+  AlertTopic:
+   Type: AWS::SNS::Topic
+   Properties:
+    Subscription:
+      - Endpoint: 'sjoerdsantema@gmail.com' #feel free to enter your own email
+        Protocol: 'email'
+    TopicName: 'FirstBoot'
   LoadBalancer: #spawn a load balancer
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
@@ -138,16 +145,46 @@ Resources:
     Properties:
       LaunchConfigurationName: !Ref AsgLaunchConfiguration
       MinSize: 2
-      MaxSize: 2
+      MaxSize: 4
       LoadBalancerNames:
         - !Ref LoadBalancer
       VPCZoneIdentifier:
         - !Ref AutoScalingSubnet
         - !Ref AutoScaling2Subnet
+      NotificationConfigurations: #send an email to sjoerd whenever an instance is launched, terminated or dying
+      - TopicARN: !Ref AlertTopic
+        NotificationTypes:
+          - autoscaling:EC2_INSTANCE_LAUNCH
+          - autoscaling:EC2_INSTANCE_LAUNCH_ERROR
+          - autoscaling:EC2_INSTANCE_TERMINATE
+          - autoscaling:EC2_INSTANCE_TERMINATE_ERROR
       Tags:
         - Key: Name
           Value: Webserver
           PropagateAtLaunch: true
+  ScaleUpPolicy: #scaling policy
+   Type: AWS::AutoScaling::ScalingPolicy
+   Properties:
+     AdjustmentType: ChangeInCapacity
+     AutoScalingGroupName: !Ref AutoScalingGroup
+     Cooldown: '1'
+     ScalingAdjustment: '1'
+  CPUAlarmHigh:
+   Type: AWS::CloudWatch::Alarm
+   Properties:
+     EvaluationPeriods: '1'
+     Statistic: Average
+     Threshold: '10'
+     AlarmDescription: Alarm if CPU too high or metric disappears indicating instance is down
+     Period: '60'
+     AlarmActions:
+      - !Ref ScaleUpPolicy
+     Namespace: AWS/EC2
+     Dimensions:
+      - Name: AutoScalingGroup
+        Value: !Ref AutoScalingGroup
+     ComparisonOperator: GreaterThanThreshold
+     MetricName: CPUUtilization
   LogMetricsCloudWatchRole: #create cloudwatch role
     Type: AWS::IAM::Role
     Properties:
