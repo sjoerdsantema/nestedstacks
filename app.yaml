@@ -34,6 +34,9 @@ Parameters:
   Sizing:
     Description: Sizing
     Type: String
+  RdsDb:
+    Description: Endpoint of Rds
+    Type: String
 Mappings:
   EnvironmentSize:
     Small:
@@ -125,7 +128,7 @@ Resources:
            AZ=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`
            INSTANCE_ID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
            PRIVATE_IP=`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
-           INFORMATION_HTML="<html><header><title>Wowdiewow je bent online!</title></header><body><table><tr><th>AMI</th><td>${Ami}</td></tr><tr><th>Region</th><td>${AWS::Region}</td></tr></table><p>CFN template 1.0</p></body></html>"
+           INFORMATION_HTML="<html><header><title>Wow-die-wow-bow it works!</title></header><body><table><tr><th>AMI:</th><td>${Ami}</td></tr><tr><th>Region:</th><td>${AWS::Region}</td></tr><tr><th>Rds Endpoint:</th><td>${RdsDb}</td></tr></table><p><b><i>check github.com/sjoerdsantema/nestedstacks</i></b></p></body></html>"
            echo $INFORMATION_HTML > /var/www/html/index.html
       PlacementTenancy: default
       SecurityGroups:

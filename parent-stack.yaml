@@ -59,6 +59,8 @@ Resources:
         !GetAtt 'SkeletonStack.Outputs.SAutoScalingPub2Subnet'
       AutoScalingSecurityGroup:
         !GetAtt 'SkeletonStack.Outputs.SAutoScalingSecurityGroup'
+      RdsDb:
+        !GetAtt 'RdsStack.Outputs.RdsDb'
       KeyName: !Ref KeyName
       Sizing: !Ref Sizing
       Ami: !Ref Ami
