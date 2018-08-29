@@ -31,8 +31,14 @@ Parameters:
   Ami:
     Description: Selected Ami from SkeletonStack
     Type: String
+  Vpc:
+    Description: Vpc from Skeleton Stack
+    Type: String
   Sizing:
     Description: Sizing
+    Type: String
+  NotificationEmail:
+    Description: E-mail address for autoscaling notifications
     Type: String
   RdsDb:
     Description: Endpoint of Rds
@@ -49,31 +55,42 @@ Mappings:
       "EC2": "db.t2.medium"
       "DB": "db.t2.medium"
 Resources:
-  AlertTopic:
-   Type: AWS::SNS::Topic
-   Properties:
-    Subscription:
-      - Endpoint: 'sjoerdsantema@gmail.com' #feel free to enter your own email
-        Protocol: 'email'
-    TopicName: 'FirstBoot'
   LoadBalancer: #spawn a load balancer
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      CrossZone: true
+      Name: AppLoadbalancer
       Scheme: internet-facing
-      Listeners:
-        - InstancePort: '80'
-          LoadBalancerPort: '80'
-          Protocol: HTTP
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
       Subnets:
         - !Ref AutoScalingPubSubnet
         - !Ref AutoScalingPub2Subnet
-      LoadBalancerName: Loadbalancer
+      Type: application
       Tags:
         - Key: Name
-          Value: Classic Internet-Facing Loadbalancer
+          Value: Internet-Facing Application Loadbalancer
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+     DefaultActions:
+       - Type: forward
+         TargetGroupArn: !Ref ALBTargetGroup
+     LoadBalancerArn: !Ref LoadBalancer
+     Port: '80'
+     Protocol: HTTP
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+     HealthCheckIntervalSeconds: 60
+     UnhealthyThresholdCount: 10
+     HealthCheckPath: /
+     Name: MyTargetGroup
+     Port: 80
+     Protocol: HTTP
+     VpcId: !Ref Vpc
+     TargetGroupAttributes:
+       - Key: deregistration_delay.timeout_seconds
+         Value: 60
   BastionHostLaunchConfig: #create launch config for bastion host
     Type: "AWS::AutoScaling::LaunchConfiguration"
     Properties:
@@ -146,8 +163,8 @@ Resources:
       LaunchConfigurationName: !Ref AsgLaunchConfiguration
       MinSize: 2
       MaxSize: 4
-      LoadBalancerNames:
-        - !Ref LoadBalancer
+      TargetGroupARNs:
+        - !Ref ALBTargetGroup
       VPCZoneIdentifier:
         - !Ref AutoScalingSubnet
         - !Ref AutoScaling2Subnet
@@ -169,6 +186,13 @@ Resources:
      AutoScalingGroupName: !Ref AutoScalingGroup
      Cooldown: '1'
      ScalingAdjustment: '1'
+  AlertTopic:
+   Type: AWS::SNS::Topic
+   Properties:
+    Subscription:
+      - Endpoint: !Ref NotificationEmail
+        Protocol: 'email'
+    TopicName: 'FirstBoot'
   CPUAlarmHigh:
    Type: AWS::CloudWatch::Alarm
    Properties:

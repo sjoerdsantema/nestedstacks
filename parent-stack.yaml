@@ -12,6 +12,9 @@ Parameters:
   KeyName:
     Type: String
     Default: trainingdays
+  NotificationEmail:
+    Type: String
+    Default: sjoerdsantema@gmail.com
   ParDatabasename:
     Type: String
     Default: mydatabase
@@ -63,6 +66,9 @@ Resources:
         !GetAtt 'RdsStack.Outputs.RdsDb'
       KeyName: !Ref KeyName
       Sizing: !Ref Sizing
+      NotificationEmail: !Ref NotificationEmail
+      Vpc:
+        !GetAtt 'SkeletonStack.Outputs.SVPC'
       Ami: !Ref Ami
     TimeoutInMinutes: 60
  RdsStack:
