@@ -1,12 +1,14 @@
 # nestedstacks
 Set of 1 parent stack with 3 nested stacks (rds, skeleton, app/ec2)
 
-These template create:
-- 1 VPC
+These nested templates create:
+- VPC
 - Bastion host (in autoscaling group)
-- Autoscaling group with apache servers (2 AZ's, 2 private subnets)
+- Autoscaling group with Apache webservers (2 az's, 2 private subnets)
+  + Monitoring (mem-utilized) and Apache logs aggregation in Cloudwatch
+  + Notifications through SNS on scale-ups, scale-downs or failure
 - NAT gateway
-- RDS cluster
+- RDS cluster (multi-az)
 - ALB 
 
 Considerations:
