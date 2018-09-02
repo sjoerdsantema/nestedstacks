@@ -58,7 +58,6 @@ Resources:
   LoadBalancer: #spawn a load balancer
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: AppLoadbalancer
       Scheme: internet-facing
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
@@ -84,7 +83,6 @@ Resources:
      HealthCheckIntervalSeconds: 60
      UnhealthyThresholdCount: 10
      HealthCheckPath: /
-     Name: MyTargetGroup
      Port: 80
      Protocol: HTTP
      VpcId: !Ref Vpc
